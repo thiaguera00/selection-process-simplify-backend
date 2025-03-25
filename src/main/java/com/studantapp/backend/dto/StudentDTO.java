@@ -1,6 +1,9 @@
 package com.studantapp.backend.dto;
 
+import com.studantapp.backend.enums.StudentStatus;
 import lombok.Data;
+
+import java.util.Set;
 
 @Data
 public class StudentDTO {
@@ -9,8 +12,9 @@ public class StudentDTO {
     private int age;
     private String registration;
     private double gpa;
-    private String status;
+    private StudentStatus status;
     private String course;
     private int progress;
     private String photoUrl;
+    private Set<DisciplineDTO> disciplines;
 }

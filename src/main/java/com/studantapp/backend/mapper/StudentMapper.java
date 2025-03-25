@@ -1,8 +1,14 @@
 package com.studantapp.backend.mapper;
 
 import com.studantapp.backend.dto.CreateStudentDTO;
+import com.studantapp.backend.dto.DisciplineDTO;
 import com.studantapp.backend.dto.StudentDTO;
+import com.studantapp.backend.model.Discipline;
 import com.studantapp.backend.model.Student;
+
+import java.util.HashSet;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 public class StudentMapper {
 
@@ -17,6 +23,15 @@ public class StudentMapper {
         dto.setCourse(student.getCourse());
         dto.setProgress(student.getProgress());
         dto.setPhotoUrl(student.getPhotoUrl());
+
+        if (student.getDisciplines() != null) {
+            Set<DisciplineDTO> disciplineDTOs = student.getDisciplines().stream()
+            .map(DisciplineMapper::toDTO)
+            .collect(Collectors.toSet());
+
+            dto.setDisciplines(disciplineDTOs);
+        }
+
         return dto;
     }
 
@@ -29,7 +44,7 @@ public class StudentMapper {
         student.setStatus(dto.getStatus());
         student.setCourse(dto.getCourse());
         student.setProgress(dto.getProgress());
-        student.setPhotoUrl(dto.getPhotoUrl());
+
         return student;
     }
 }

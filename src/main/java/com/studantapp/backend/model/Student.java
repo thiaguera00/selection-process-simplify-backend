@@ -1,11 +1,15 @@
 package com.studantapp.backend.model;
 
+import com.studantapp.backend.enums.StudentStatus;
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.Set;
 
-@Data
+@Getter
+@Setter
 @Entity
 @Table(name = "students")
 public class Student {
@@ -19,7 +23,8 @@ public class Student {
 
     private double gpa;
 
-    private String status;
+    @Enumerated(EnumType.STRING)
+    private StudentStatus status;
     private String course;
     private int progress;
     private String photoUrl;
