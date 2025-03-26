@@ -6,11 +6,9 @@ import com.studantapp.backend.mapper.StudentMapper;
 import com.studantapp.backend.model.Student;
 import com.studantapp.backend.service.CloudinaryService;
 import com.studantapp.backend.service.StudentService;
-import static com.studantapp.backend.mapper.StudentMapper.*;
 
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
@@ -54,11 +52,31 @@ public class StudentController {
         return ResponseEntity.ok(StudentMapper.toDTO(saved));
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<StudentDTO> updateStudent(@PathVariable Long id, @RequestBody CreateStudentDTO data) {
-        return service.updateStudent(id, fromCreateDTO(data))
-                .map(StudentMapper::toDTO)
-                .map(ResponseEntity::ok)
+    @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<StudentDTO> updateStudent(
+            @PathVariable Long id,
+            @ModelAttribute CreateStudentDTO dto
+    ) throws IOException {
+        return service.findById(id)
+                .map(existingStudent -> {
+                    Student updatedStudent = StudentMapper.fromCreateDTO(dto);
+
+                    if (dto.getPhoto() != null && !dto.getPhoto().isEmpty()) {
+                        try {
+                            String imageUrl = cloudinaryService.uploadImage(dto.getPhoto());
+                            updatedStudent.setPhotoUrl(imageUrl);
+                        } catch (IOException e) {
+                            throw new RuntimeException("Erro ao fazer upload da imagem", e);
+                        }
+                    } else {
+                        updatedStudent.setPhotoUrl(existingStudent.getPhotoUrl());
+                    }
+
+                    return service.updateStudent(id, updatedStudent)
+                            .map(StudentMapper::toDTO)
+                            .map(ResponseEntity::ok)
+                            .orElse(ResponseEntity.notFound().build());
+                })
                 .orElse(ResponseEntity.notFound().build());
     }
 
