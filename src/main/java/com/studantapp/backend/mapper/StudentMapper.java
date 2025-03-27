@@ -7,6 +7,7 @@ import com.studantapp.backend.model.Discipline;
 import com.studantapp.backend.model.Student;
 
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -24,13 +25,14 @@ public class StudentMapper {
         dto.setProgress(student.getProgress());
         dto.setPhotoUrl(student.getPhotoUrl());
 
-        if (student.getDisciplines() != null) {
-            Set<DisciplineDTO> disciplineDTOs = student.getDisciplines().stream()
-            .map(DisciplineMapper::toDTO)
-            .collect(Collectors.toSet());
+        Set<DisciplineDTO> disciplineDTOs =
+                Optional.ofNullable(student.getDisciplines())
+                        .orElse(new HashSet<>())
+                        .stream()
+                        .map(DisciplineMapper::toDTO)
+                        .collect(Collectors.toSet());
 
-            dto.setDisciplines(disciplineDTOs);
-        }
+        dto.setDisciplines(disciplineDTOs);
 
         return dto;
     }
